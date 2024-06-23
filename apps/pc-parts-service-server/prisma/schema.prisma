@@ -1,0 +1,69 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Product {
+  buildParts  BuildPart[]
+  category    Category?   @relation(fields: [categoryId], references: [id])
+  categoryId  String?
+  createdAt   DateTime    @default(now())
+  description String?
+  id          String      @id @default(cuid())
+  imageUrl    String?
+  name        String?
+  price       Float?
+  updatedAt   DateTime    @updatedAt
+}
+
+model Build {
+  buildParts BuildPart[]
+  createdAt  DateTime    @default(now())
+  id         String      @id @default(cuid())
+  name       String?
+  totalPrice Float?
+  updatedAt  DateTime    @updatedAt
+  user       User?       @relation(fields: [userId], references: [id])
+  userId     String?
+}
+
+model Category {
+  createdAt DateTime  @default(now())
+  id        String    @id @default(cuid())
+  name      String?
+  products  Product[]
+  updatedAt DateTime  @updatedAt
+}
+
+model BuildPart {
+  build     Build?   @relation(fields: [buildId], references: [id])
+  buildId   String?
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  product   Product? @relation(fields: [productId], references: [id])
+  productId String?
+  quantity  Int?
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  builds    Build[]
+  createdAt DateTime      @default(now())
+  email     String?       @unique
+  firstName String?
+  id        String        @id @default(cuid())
+  lastName  String?
+  password  String
+  role      EnumUserRole?
+  roles     Json
+  updatedAt DateTime      @updatedAt
+  username  String        @unique
+}
+
+enum EnumUserRole {
+  Option1
+}
